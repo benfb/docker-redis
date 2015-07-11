@@ -1,0 +1,14 @@
+machine:
+  services:
+    - docker
+dependencies:
+  cache_directories:
+    - "~/docker-redis"
+  override:
+    - docker info
+    - if [[ -e ~/docker-redis/image.tar ]]; then docker load --input ~/docker-redis/image.tar; fi
+    - docker build -t bbailey/redis .
+    - mkdir -p ~/docker-redis; docker save --output ~/docker-redis/image.tar bbailey/redis
+test:
+  override:  
+    - docker run -d bbailey/redis test -e /usr/bin/redis-server
